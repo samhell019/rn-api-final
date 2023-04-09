@@ -1,0 +1,1 @@
+export const API = "https://localhost:7090"; // adresa API
