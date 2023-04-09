@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Button, FlatList } from 'react-native';
+import { View, Text, Button, FlatList, TextInput } from 'react-native';
 import {requireAuth} from '../../hocs/requireAuth';
 import { useAuthContext } from '../../providers/AuthProvider';
 import CalendarPicker from 'react-native-calendar-picker';
@@ -13,9 +13,12 @@ const Add = () => {
   const [{accessToken, userId}, dispatch] = useAuthContext();
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [startTime, setStartTime] = useState("00:00");
+  const [endTime, setEndTime] = useState("00:00");
   const [data, setData] = useState([]);
   const [isUserInstructor, setIsUserInstructor] = useState(false);
   const [newDate, setNewDate] = useState(new Date());
+  const [newDate2, setNewDate2] = useState(new Date());
   const getFreeDrives = useCallback(() => {
     console.log("jizdy")
     setIsLoading(true);
@@ -90,11 +93,20 @@ const Add = () => {
   }
 
   const PostDrive = () => {
-    const data = { 
-        Date: newDate.toString(),
+    console.log(newDate)
+    setNewDate2(newDate);
+    newDate.setHours(startTime.split(":")[0]);
+    newDate.setMinutes(startTime.split(":")[1]);
+    newDate2.setHours(endTime.split(":")[0]);
+    newDate2.setMinutes(endTime.split(":")[1]);
+    // endDate.setHours(endTime.split(":")[0], endTime.split(":")[1], 0, 0);
+    const data = {
+        insId: userId, 
+        DateStart: newDate.toISOString(),
+        DateEnd: newDate2.toISOString(),
       };
     //axios post
-    axios.post(API + "/api/Drive/new/" + userId, data, {
+    axios.post(API + "/api/Drive/new", data, {
         headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + accessToken // pro autorizaci
@@ -128,8 +140,26 @@ const Add = () => {
         {/* <Text>Jste instruktor</Text>  */}
         <CalendarPicker
         Date = {newDate}
-  onDateChange={(date) => setNewDate(date)}
+  onDateChange={(date) => setNewDate(date._d)}
 />
+<View style={{ flexDirection: "row" }}>
+          <Text style={{}}>{"Start :    "}</Text>
+          <TextInput
+            style={{}}
+            keyboardType={"numeric"}
+            value={startTime}
+            onChangeText={(text) => setStartTime(text)}
+          />
+     </View>
+     <View style={{ flexDirection: "row" }}>
+          <Text style={{}}>{"End :    "}</Text>
+          <TextInput
+            style={{}}
+            keyboardType={"numeric"}
+            value={endTime}
+            onChangeText={(text) => setEndTime(text)}
+          />
+     </View>
 <Button title="Pridat jizdu" onPress={() => {PostDrive()}} />
         </>
 
@@ -140,11 +170,11 @@ const Add = () => {
         <FlatList 
                  data={data}
                  renderItem={({item}) => <>
-                  <Text>{item.instructorName}. {item.date} </Text>
+                  <Text>{item.instructorName}. {item.startDate} </Text>
                   <Button title="Zapsat se" onPress={() => ZapsatSe(item.driveId)} />
                  </>}
                  keyExtractor={item => item.driveId} />
-             }
+             
          <Button title="Znovu načíst" onPress={() => {isInstructor()}} />
          </>
         }

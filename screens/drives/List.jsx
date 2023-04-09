@@ -51,7 +51,7 @@ export const Drives = props => {
                             <Text>ID jízdy: {item.driveId}</Text>
                             <Text>Student: {item.studentName}</Text>
                             <Text>Instruktor: {item.instructorName}</Text>
-                            <Text>Datum: {item.date}</Text>
+                            <Text>Datum: {item.startDate}</Text>
                         </View>
                     }
                         keyExtractor={item => item.driveId} />
